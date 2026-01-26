@@ -214,12 +214,7 @@ impl VaultixEscrow {
     ///
     /// # Errors
     /// * `EscrowNotFound` - If escrow doesn't exist
-    pub fn get_escrow(env: Env, escrow_id: u64) -> Result<Escrow, Error> {
-        let storage_key = get_storage_key(escrow_id);
-        env.storage()
-            .persistent()
-            .get(&storage_key)
-            .ok_or(Error::EscrowNotFound)
+ 
     }
 
     /// Cancels an escrow before any milestones are released.
