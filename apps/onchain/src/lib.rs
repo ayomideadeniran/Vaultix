@@ -183,7 +183,6 @@ impl VaultixEscrow {
         token_address: Address,
         milestones: Vec<Milestone>,
         deadline: u64,
-        token: Address,
     ) -> Result<(), Error> {
         // Authenticate the depositor
         depositor.require_auth();
@@ -214,11 +213,11 @@ impl VaultixEscrow {
         let escrow = Escrow {
             depositor: depositor.clone(),
             recipient,
-            token_address,
+            token_address: token_address.clone(),
             total_amount,
             total_released: 0,
             milestones: initialized_milestones,
-            token: token,
+            token: token_address,
             status: EscrowStatus::Created, // Initially Created, becomes Active after deposit
             deadline,
         };

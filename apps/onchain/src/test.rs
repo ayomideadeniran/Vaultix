@@ -4,7 +4,8 @@ use soroban_sdk::{Address, Env, testutils::Address as _, token, vec};
 /// Helper function to create and initialize a test token
 /// Returns admin client for minting and the token address
 fn create_test_token<'a>(env: &Env, admin: &Address) -> (token::StellarAssetClient<'a>, Address) {
-    let token_address = env.register_stellar_asset_contract(admin.clone());
+    let token_contract = env.register_stellar_asset_contract_v2(admin.clone());
+    let token_address = token_contract.address(); // Get the address from the contract
     let token_admin_client = token::StellarAssetClient::new(env, &token_address);
     (token_admin_client, token_address)
 }
@@ -55,7 +56,6 @@ fn test_create_and_get_escrow() {
         &token_address,
         &milestones,
         &deadline,
-        &token_address,
     );
 
     // Retrieve escrow
@@ -113,7 +113,6 @@ fn test_deposit_funds() {
         &token_address,
         &milestones,
         &1706400000u64,
-        &token_address,
     );
 
     // Approve contract to spend tokens
@@ -172,7 +171,6 @@ fn test_release_milestone_with_tokens() {
         &token_address,
         &milestones,
         &1706400000u64,
-        &token_address,
     );
     token_client.approve(&depositor, &contract_id, &10_000, &200);
     client.deposit_funds(&escrow_id);
@@ -242,7 +240,6 @@ fn test_complete_escrow_with_all_releases() {
         &token_address,
         &milestones,
         &1706400000u64,
-        &token_address,
     );
     token_client.approve(&depositor, &contract_id, &10_000, &200);
     client.deposit_funds(&escrow_id);
@@ -301,7 +298,6 @@ fn test_cancel_escrow_with_refund() {
         &token_address,
         &milestones,
         &1706400000u64,
-        &token_address,
     );
     token_client.approve(&depositor, &contract_id, &10_000, &200);
     client.deposit_funds(&escrow_id);
@@ -353,7 +349,6 @@ fn test_cancel_unfunded_escrow() {
         &token_address,
         &milestones,
         &1706400000u64,
-        &token_address,
     );
 
     // Cancel unfunded escrow (no refund needed)
@@ -395,7 +390,6 @@ fn test_duplicate_escrow_id() {
         &token_address,
         &milestones,
         &1706400000u64,
-        &token_address,
     );
     // This should panic with Error #2 (EscrowAlreadyExists)
     client.create_escrow(
@@ -405,7 +399,6 @@ fn test_duplicate_escrow_id() {
         &token_address,
         &milestones,
         &1706400000u64,
-        &token_address,
     );
 }
 
@@ -447,7 +440,6 @@ fn test_double_release() {
         &token_address,
         &milestones,
         &1706400000u64,
-        &token_address,
     );
     token_client.approve(&depositor, &contract_id, &1000, &200);
     client.deposit_funds(&escrow_id);
@@ -494,7 +486,6 @@ fn test_too_many_milestones() {
         &token_address,
         &milestones,
         &1706400000u64,
-        &token_address,
     );
 }
 
@@ -531,7 +522,6 @@ fn test_invalid_milestone_amount() {
         &token_address,
         &milestones,
         &1706400000u64,
-        &token_address,
     );
 }
 
@@ -567,7 +557,6 @@ fn test_zero_amount_milestone_rejected() {
         &token_address,
         &milestones,
         &1706400000u64,
-        &token_address,
     );
 
     // Assert specific error is returned
@@ -606,7 +595,6 @@ fn test_negative_amount_milestone_rejected() {
         &token_address,
         &milestones,
         &1706400000u64,
-        &token_address,
     );
 
     // Assert ZeroAmount error (covers negative case)
@@ -644,7 +632,6 @@ fn test_self_dealing_rejected() {
         &token_address,
         &milestones,
         &1706400000u64,
-        &token_address,
     );
 
     // Assert SelfDealing error
@@ -688,7 +675,6 @@ fn test_valid_escrow_creation_succeeds() {
         &token_address,
         &milestones,
         &1706400000u64,
-        &token_address,
     );
 
     // Assert success
@@ -737,7 +723,6 @@ fn test_double_deposit_rejected() {
         &token_address,
         &milestones,
         &1706400000u64,
-        &token_address,
     );
 
     token_client.approve(&depositor, &contract_id, &10_000, &200);
@@ -779,7 +764,6 @@ fn test_release_milestone_before_deposit() {
         &token_address,
         &milestones,
         &1706400000u64,
-        &token_address,
     );
 
     // Try to release milestone before depositing funds
